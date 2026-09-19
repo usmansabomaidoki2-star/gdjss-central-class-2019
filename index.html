@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GDJSS Central Class of 2019</title>
+  <title>GDJSS Central Class of 2019 Association</title>
 
   <style>
     body {
@@ -25,22 +25,22 @@
       font-size: 28px;
     }
 
-    header p {
-      font-size: 16px;
-    }
-
     .container {
       max-width: 900px;
       margin: auto;
       padding: 25px 15px;
     }
 
-    .welcome {
+    .welcome, .card {
       background: white;
       padding: 25px;
       border-radius: 12px;
-      text-align: center;
+      margin-bottom: 20px;
       box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+
+    .welcome {
+      text-align: center;
     }
 
     .welcome h2 {
@@ -58,23 +58,15 @@
       margin-top: 15px;
     }
 
-    .register-btn:hover {
-      background: #064c44;
-    }
-
     .features {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 15px;
-      margin-top: 25px;
     }
 
     .card {
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
       text-align: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      margin-bottom: 0;
     }
 
     footer {
@@ -89,49 +81,51 @@
 
 <body>
 
-  <header>
-    <h1>GDJSS CENTRAL CLASS OF 2019</h1>
-    <p>Official Class Association Website</p>
-  </header>
+<header>
+  <h1>GDJSS CENTRAL CLASS OF 2019</h1>
+  <p>Official Class Association Website</p>
+</header>
 
-  <div class="container">
+<div class="container">
 
-    <div class="welcome">
-      <h2>Welcome, Class of 2019 🎓</h2>
+  <div class="welcome">
+    <h2>Welcome, Class of 2019 🎓</h2>
 
-      <p>
-        Welcome to the official website of GDJSS Central Class of 2019 Association.
-        This platform is created for our classmates to connect, register,
-        and stay united.
-      </p>
+    <p>
+      Welcome to the official website of GDJSS Central Class of 2019 Association.
+      This platform is created for our classmates to connect, register,
+      and stay united.
+    </p>
 
-      <a href="#" class="register-btn">Member Registration</a>
+    <a href="register.html" class="register-btn">
+      Member Registration
+    </a>
+  </div>
+
+  <div class="features">
+
+    <div class="card">
+      <h3>👥 Members</h3>
+      <p>Connect with members of our 2019 class.</p>
     </div>
 
-    <div class="features">
+    <div class="card">
+      <h3>📝 Registration</h3>
+      <p>Register as a member of the association.</p>
+    </div>
 
-      <div class="card">
-        <h3>👥 Members</h3>
-        <p>Connect with members of our 2019 class.</p>
-      </div>
-
-      <div class="card">
-        <h3>📝 Registration</h3>
-        <p>Register as a member of the association.</p>
-      </div>
-
-      <div class="card">
-        <h3>🆔 Member ID</h3>
-        <p>Approved members will receive a unique Member ID.</p>
-      </div>
-
+    <div class="card">
+      <h3>🆔 Member ID</h3>
+      <p>Approved members will receive a unique Member ID.</p>
     </div>
 
   </div>
 
-  <footer>
-    <p>© 2026 GDJSS Central Class of 2019 Association</p>
-  </footer>
+</div>
+
+<footer>
+  <p>© 2026 GDJSS Central Class of 2019 Association</p>
+</footer>
 
 </body>
 </html>
