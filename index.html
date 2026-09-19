@@ -3,24 +3,135 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GDJSS Central Class of 2019 Association</title>
+  <title>GDJSS Central Class of 2019</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f7f6;
+      color: #222;
+    }
+
+    header {
+      background: #075e54;
+      color: white;
+      text-align: center;
+      padding: 35px 15px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+
+    header p {
+      font-size: 16px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 25px 15px;
+    }
+
+    .welcome {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+
+    .welcome h2 {
+      color: #075e54;
+    }
+
+    .register-btn {
+      display: inline-block;
+      background: #075e54;
+      color: white;
+      padding: 14px 25px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+
+    .register-btn:hover {
+      background: #064c44;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 25px;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    footer {
+      background: #075e54;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      margin-top: 30px;
+    }
+  </style>
 </head>
 
 <body>
 
-  <h1>GDJSS CENTRAL CLASS OF 2019 ASSOCIATION</h1>
+  <header>
+    <h1>GDJSS CENTRAL CLASS OF 2019</h1>
+    <p>Official Class Association Website</p>
+  </header>
 
-  <h2>Welcome</h2>
-  <p>
-    Welcome to the official website of GDJSS Central Class of 2019 Association.
-  </p>
+  <div class="container">
 
-  <h2>Member Registration</h2>
-  <p>
-    Register to become a member of our association.
-  </p>
+    <div class="welcome">
+      <h2>Welcome, Class of 2019 🎓</h2>
 
-  <button>Register Now</button>
+      <p>
+        Welcome to the official website of GDJSS Central Class of 2019 Association.
+        This platform is created for our classmates to connect, register,
+        and stay united.
+      </p>
+
+      <a href="#" class="register-btn">Member Registration</a>
+    </div>
+
+    <div class="features">
+
+      <div class="card">
+        <h3>👥 Members</h3>
+        <p>Connect with members of our 2019 class.</p>
+      </div>
+
+      <div class="card">
+        <h3>📝 Registration</h3>
+        <p>Register as a member of the association.</p>
+      </div>
+
+      <div class="card">
+        <h3>🆔 Member ID</h3>
+        <p>Approved members will receive a unique Member ID.</p>
+      </div>
+
+    </div>
+
+  </div>
+
+  <footer>
+    <p>© 2026 GDJSS Central Class of 2019 Association</p>
+  </footer>
 
 </body>
 </html>
