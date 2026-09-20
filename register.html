@@ -232,10 +232,10 @@
 
     } catch (error) {
 
-      console.error(error);
+      console.error("Registration error:", error);
 
       message.textContent =
-        "Registration failed. Please try again.";
+        "Error: " + (error.message || "Unknown error"); 
 
     }
 
