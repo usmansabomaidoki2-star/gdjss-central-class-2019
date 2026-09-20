@@ -170,8 +170,7 @@
         Date.now() + "_" +
         photo.name.replace(/\s+/g, "_");
 
-      const filePath = fileName;
-
+      const filePath = "members/" + fileName;
       const { error: uploadError } =
         await db.storage
           .from("passport-photos")
