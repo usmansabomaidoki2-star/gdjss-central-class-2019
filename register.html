@@ -485,43 +485,32 @@ form.addEventListener(
                 "Saving registration...";
 
 
-            const insertResult =
-                await db
-                .from("Members")
-                .insert({
+ const insertResult =
+    await db
+    .from("Members")
+    .insert({
 
-                    "Full name":
-                        fullName,
+        "Full name": fullName,
 
-                    phone:
-                        phone,
+        phone: phone,
 
-                    gender:
-                        gender,
+        gender: gender,
 
-                    state:
-                        state,
+        state: state,
 
-                    city:
-                        city,
-     
+        city: city,
 
-                    "class section":
-                        classSection,
+        "class section": classSection,
 
-                    occupation:
-                        occupation,
+        occupation: occupation,
 
-                    email:
-                        email,
+        email: email,
 
-                    "Photo_url":
-                        filePath,
+        "Photo_url": filePath,
 
-                    status:
-                        "pending"
+        status: "pending"
 
-                });
+    });
 
 
             if(insertResult.error){
