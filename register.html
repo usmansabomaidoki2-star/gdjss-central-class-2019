@@ -7,10 +7,15 @@
 <title>GDJSS CENTRAL CLASS OF 2019 - Registration</title>
 
 <style>
+*{
+    box-sizing:border-box;
+}
+
 body{
     font-family:Arial,sans-serif;
     margin:0;
     background:#f4f7f6;
+    color:#222;
 }
 
 header{
@@ -18,6 +23,15 @@ header{
     color:white;
     text-align:center;
     padding:25px 15px;
+}
+
+header h1{
+    margin:0 0 8px;
+    font-size:26px;
+}
+
+header p{
+    margin:0;
 }
 
 .container{
@@ -33,6 +47,10 @@ header{
     box-shadow:0 3px 10px rgba(0,0,0,.1);
 }
 
+h2{
+    margin-top:0;
+}
+
 label{
     display:block;
     margin-top:15px;
@@ -45,7 +63,6 @@ textarea{
     width:100%;
     padding:12px;
     margin-top:7px;
-    box-sizing:border-box;
     border:1px solid #ccc;
     border-radius:7px;
     font-size:16px;
@@ -53,6 +70,7 @@ textarea{
 
 textarea{
     min-height:90px;
+    resize:vertical;
 }
 
 button{
@@ -65,16 +83,19 @@ button{
     border-radius:7px;
     font-size:17px;
     font-weight:bold;
+    cursor:pointer;
 }
 
 button:disabled{
     background:#777;
+    cursor:not-allowed;
 }
 
 #message{
     margin-top:15px;
     text-align:center;
     font-weight:bold;
+    line-height:1.5;
 }
 
 .success{
@@ -100,71 +121,106 @@ button:disabled{
 
 <div class="container">
 
-<div class="form-box">
+    <div class="form-box">
 
-<h2>Register as a Member</h2>
+        <h2>Register as a Member</h2>
 
-<form id="registrationForm">
+        <form id="registrationForm">
 
-<label>Full Name</label>
-<input type="text" id="fullName" required>
+            <label>Full Name</label>
+            <input
+                type="text"
+                id="fullName"
+                required
+            >
 
-<label>Phone Number</label>
-<input type="tel" id="phone" required>
+            <label>Phone Number</label>
+            <input
+                type="tel"
+                id="phone"
+                required
+            >
 
-<label>Gender</label>
-<select id="gender" required>
-    <option value="">Select Gender</option>
-    <option value="Male">Male</option>
-    <option value="Female">Female</option>
-</select>
+            <label>Gender</label>
+            <select id="gender" required>
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+            </select>
 
-<label>State</label>
-<input type="text" id="state" required>
+            <label>State</label>
+            <input
+                type="text"
+                id="state"
+                required
+            >
 
-<label>City / Town</label>
-<input type="text" id="city" required>
+            <label>City / Town</label>
+            <input
+                type="text"
+                id="city"
+                required
+            >
 
-<label>Current Address</label>
-<textarea id="address"></textarea>
+            <label>Current Address</label>
+            <textarea id="address"></textarea>
 
-<label>Class / Section</label>
-<input type="text" id="classSection">
+            <label>Class / Section</label>
+            <input
+                type="text"
+                id="classSection"
+            >
 
-<label>Occupation</label>
-<input type="text" id="occupation">
+            <label>WhatsApp Number</label>
+            <input
+                type="tel"
+                id="whatsapp"
+            >
 
-<label>Email</label>
-<input type="email" id="email">
+            <label>Occupation</label>
+            <input
+                type="text"
+                id="occupation"
+            >
 
-<label>Passport Photo</label>
-<input
-    type="file"
-    id="passportPhoto"
-    accept="image/*"
-    required
->
+            <label>Email</label>
+            <input
+                type="email"
+                id="email"
+            >
 
-<button
-    type="submit"
-    id="submitButton"
->
-    Submit Registration
-</button>
+            <label>Passport Photo</label>
+            <input
+                type="file"
+                id="passportPhoto"
+                accept="image/jpeg,image/png,image/webp"
+                required
+            >
 
-<div id="message"></div>
+            <button
+                type="submit"
+                id="submitButton"
+            >
+                Submit Registration
+            </button>
 
-</form>
+            <div id="message"></div>
+
+        </form>
+
+    </div>
 
 </div>
-</div>
+
+
+<!-- SUPABASE -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
 
 /* =========================================
-   SUPABASE
+   SUPABASE CONFIG
 ========================================= */
 
 const SUPABASE_URL =
@@ -173,14 +229,15 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
     "sb_publishable_cW8I1UvkW1jvGNDeh_NTPg_QicAc9G7";
 
-const db = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-);
+const db =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
 
 
 /* =========================================
-   FORM
+   FORM ELEMENTS
 ========================================= */
 
 const form =
@@ -194,194 +251,398 @@ const submitButton =
 
 
 /* =========================================
-   SUBMIT
+   CONVERT IMAGE TO JPEG
 ========================================= */
 
-form.addEventListener("submit", async function(event){
+function convertToJPEG(file){
 
-    event.preventDefault();
+    return new Promise((resolve,reject)=>{
 
-    message.className = "loading";
-    message.textContent = "Submitting registration...";
+        const reader = new FileReader();
 
-    submitButton.disabled = true;
+        reader.onload = function(event){
 
-    try {
+            const img = new Image();
 
-        /* GET FORM DATA */
+            img.onload = function(){
 
-        const fullName =
-            document.getElementById("fullName").value.trim();
+                const canvas =
+                    document.createElement("canvas");
 
-        const phone =
-            document.getElementById("phone").value.trim();
+                let width = img.width;
+                let height = img.height;
 
-        const gender =
-            document.getElementById("gender").value;
+                const maxSize = 1200;
 
-        const state =
-            document.getElementById("state").value.trim();
+                if(width > maxSize || height > maxSize){
 
-        const city =
-            document.getElementById("city").value.trim();
+                    if(width > height){
 
-        const classSection =
-            document.getElementById("classSection").value.trim();
+                        height =
+                            Math.round(
+                                height * maxSize / width
+                            );
 
-        const occupation =
-            document.getElementById("occupation").value.trim();
+                        width = maxSize;
 
-        const email =
-            document.getElementById("email").value.trim();
+                    }else{
 
-        const photo =
-            document.getElementById("passportPhoto").files[0];
+                        width =
+                            Math.round(
+                                width * maxSize / height
+                            );
 
-
-        /* CHECK PHOTO */
-
-        if (!photo) {
-
-            throw new Error(
-                "Please select a passport photo."
-            );
-
-        }
-
-
-        /* =====================================
-           UPLOAD PHOTO
-        ===================================== */
-
-        message.textContent =
-            "Uploading passport photo...";
-
-
-        const fileExtension =
-            photo.name.includes(".")
-            ? photo.name.split(".").pop()
-            : "jpg";
-
-
-        const fileName =
-            Date.now() +
-            "_" +
-            Math.random()
-                .toString(36)
-                .substring(2, 8) +
-            "." +
-            fileExtension;
-
-
-        const filePath =
-            "members/" + fileName;
-
-
-        const uploadResult =
-            await db.storage
-            .from("passport-photos")
-            .upload(
-                filePath,
-                photo,
-                {
-                    contentType: photo.type,
-                    upsert: false
+                        height = maxSize;
+                    }
                 }
+
+                canvas.width = width;
+                canvas.height = height;
+
+                const ctx =
+                    canvas.getContext("2d");
+
+                ctx.fillStyle = "#ffffff";
+
+                ctx.fillRect(
+                    0,
+                    0,
+                    width,
+                    height
+                );
+
+                ctx.drawImage(
+                    img,
+                    0,
+                    0,
+                    width,
+                    height
+                );
+
+                canvas.toBlob(
+                    function(blob){
+
+                        if(!blob){
+
+                            reject(
+                                new Error(
+                                    "Could not convert photo."
+                                )
+                            );
+
+                            return;
+                        }
+
+                        const jpegFile =
+                            new File(
+                                [blob],
+                                "passport.jpg",
+                                {
+                                    type:"image/jpeg"
+                                }
+                            );
+
+                        resolve(jpegFile);
+
+                    },
+                    "image/jpeg",
+                    0.80
+                );
+            };
+
+            img.onerror = function(){
+
+                reject(
+                    new Error(
+                        "Could not read the selected photo."
+                    )
+                );
+            };
+
+            img.src = event.target.result;
+        };
+
+        reader.onerror = function(){
+
+            reject(
+                new Error(
+                    "Could not read selected file."
+                )
+            );
+        };
+
+        reader.readAsDataURL(file);
+    });
+}
+
+
+/* =========================================
+   SUBMIT REGISTRATION
+========================================= */
+
+form.addEventListener(
+    "submit",
+    async function(event){
+
+        event.preventDefault();
+
+        message.className = "loading";
+
+        message.textContent =
+            "Submitting registration...";
+
+        submitButton.disabled = true;
+
+
+        try{
+
+            /* ================================
+               GET FORM DATA
+            ================================= */
+
+            const fullName =
+                document
+                .getElementById("fullName")
+                .value
+                .trim();
+
+            const phone =
+                document
+                .getElementById("phone")
+                .value
+                .trim();
+
+            const gender =
+                document
+                .getElementById("gender")
+                .value;
+
+            const state =
+                document
+                .getElementById("state")
+                .value
+                .trim();
+
+            const city =
+                document
+                .getElementById("city")
+                .value
+                .trim();
+
+            const address =
+                document
+                .getElementById("address")
+                .value
+                .trim();
+
+            const classSection =
+                document
+                .getElementById("classSection")
+                .value
+                .trim();
+
+            const whatsapp =
+                document
+                .getElementById("whatsapp")
+                .value
+                .trim();
+
+            const occupation =
+                document
+                .getElementById("occupation")
+                .value
+                .trim();
+
+            const email =
+                document
+                .getElementById("email")
+                .value
+                .trim();
+
+            const originalPhoto =
+                document
+                .getElementById("passportPhoto")
+                .files[0];
+
+
+            /* ================================
+               CHECK PHOTO
+            ================================= */
+
+            if(!originalPhoto){
+
+                throw new Error(
+                    "Please select a passport photo."
+                );
+            }
+
+
+            /* ================================
+               PREPARE PHOTO
+            ================================= */
+
+            message.textContent =
+                "Preparing passport photo...";
+
+            const photo =
+                await convertToJPEG(
+                    originalPhoto
+                );
+
+
+            /* ================================
+               CREATE FILE NAME
+            ================================= */
+
+            const fileName =
+                Date.now() +
+                "_" +
+                Math.random()
+                .toString(36)
+                .substring(2,8) +
+                ".jpg";
+
+            const filePath =
+                "members/" + fileName;
+
+
+            /* ================================
+               UPLOAD PHOTO
+            ================================= */
+
+            message.textContent =
+                "Uploading passport photo...";
+
+
+            const {
+                error: uploadError
+            } =
+                await db.storage
+                .from("passport-photos")
+                .upload(
+                    filePath,
+                    photo,
+                    {
+                        contentType:
+                            "image/jpeg",
+
+                        upsert:false
+                    }
+                );
+
+
+            if(uploadError){
+
+                throw new Error(
+                    "Photo upload failed: " +
+                    uploadError.message
+                );
+            }
+
+
+            /* ================================
+               SAVE MEMBER
+            ================================= */
+
+            message.textContent =
+                "Saving registration...";
+
+
+            const {
+                error: insertError
+            } =
+                await db
+                .from("Members")
+                .insert({
+
+                    "Phone":
+                        phone,
+
+                    "Full name":
+                        fullName,
+
+                    "Gender":
+                        gender,
+
+                    "State":
+                        state,
+
+                    "City":
+                        city,
+
+                    "Address":
+                        address,
+
+                    "Class section":
+                        classSection,
+
+                    "Whatsapp":
+                        whatsapp,
+
+                    "Occupation":
+                        occupation,
+
+                    "Email":
+                        email,
+
+                    "Photo_url":
+                        filePath,
+
+                    "status":
+                        "pending"
+
+                });
+
+
+            if(insertError){
+
+                throw new Error(
+                    "Database error: " +
+                    insertError.message
+                );
+            }
+
+
+            /* ================================
+               SUCCESS
+            ================================= */
+
+            message.className =
+                "success";
+
+            message.textContent =
+                "Registration submitted successfully! Please wait for admin approval.";
+
+            form.reset();
+
+
+        }catch(error){
+
+            console.error(
+                "Registration error:",
+                error
             );
 
+            message.className =
+                "error";
 
-        if (uploadResult.error) {
+            message.textContent =
+                "Error: " +
+                (
+                    error.message ||
+                    "Unknown error"
+                );
 
-            throw new Error(
-                "Photo upload failed: " +
-                uploadResult.error.message
-            );
+
+        }finally{
+
+            submitButton.disabled =
+                false;
 
         }
-
-
-        /* =====================================
-           SAVE MEMBER
-        ===================================== */
-
-        message.textContent =
-            "Saving registration...";
-
-
-        const insertResult =
-            await db
-            .from("Members")
-            .insert({
-
-                "Full name": fullName,
-
-                phone: phone,
-
-                gender: gender,
-
-                state: state,
-
-                city: city,
-
-                "class section": classSection,
-
-                occupation: occupation,
-
-                email: email,
-
-                "Photo_url": filePath,
-
-                status: "pending"
-
-            });
-
-
-        if (insertResult.error) {
-
-            throw new Error(
-                "Database error: " +
-                insertResult.error.message
-            );
-
-        }
-
-
-        /* =====================================
-           SUCCESS
-        ===================================== */
-
-        message.className = "success";
-
-        message.textContent =
-            "Registration submitted successfully! Please wait for admin approval.";
-
-        form.reset();
-
-
-    } catch (error) {
-
-        console.error(
-            "Registration error:",
-            error
-        );
-
-        message.className = "error";
-
-        message.textContent =
-            "Error: " +
-            (
-                error.message ||
-                "Unknown error"
-            );
-
-
-    } finally {
-
-        submitButton.disabled = false;
 
     }
-
-});
+);
 
 </script>
 
