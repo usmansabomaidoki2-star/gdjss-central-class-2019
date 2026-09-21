@@ -196,8 +196,58 @@ const supabaseClient =
    LOGIN  
 ========================= */  
   
-async function loginAdmin(){  
-  
+async function loginAdmin() {
+
+    const email = document.getElementById("adminEmail").value.trim();
+    const password = document.getElementById("adminPassword").value;
+    const message = document.getElementById("loginMessage");
+
+    message.className = "";
+    message.textContent = "Logging in...";
+
+    if (!email || !password) {
+        message.className = "error";
+        message.textContent = "Please enter email and password.";
+        return;
+    }
+
+    try {
+
+        const { data, error } =
+            await supabaseClient.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
+
+        if (error) {
+            message.className = "error";
+            message.textContent = error.message;
+            return;
+        }
+
+        if (!data || !data.user) {
+            message.className = "error";
+            message.textContent = "Login failed. User not found.";
+            return;
+        }
+
+        message.className = "success";
+        message.textContent = "Login successful! Loading dashboard...";
+
+        document.getElementById("loginBox").style.display = "none";
+        document.getElementById("dashboard").style.display = "block";
+
+        await loadMembers();
+
+    } catch (err) {
+
+        message.className = "error";
+        message.textContent =
+            "Error: " + (err.message || "Unknown error");
+
+        console.error(err);
+    }
+}  
     const email =  
         document.getElementById("adminEmail").value.trim();  
   
