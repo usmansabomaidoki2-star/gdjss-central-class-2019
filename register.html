@@ -346,33 +346,127 @@ function convertToJPEG(file){
 
                     },
                     "image/jpeg",
+function convertToJPEG(file) {
+
+    return new Promise((resolve, reject) => {
+
+        const imageURL = URL.createObjectURL(file);
+
+        const img = new Image();
+
+        img.onload = function () {
+
+            try {
+
+                const canvas =
+                    document.createElement("canvas");
+
+                let width = img.naturalWidth;
+                let height = img.naturalHeight;
+
+                const maxSize = 1200;
+
+                if (width > maxSize || height > maxSize) {
+
+                    if (width > height) {
+
+                        height = Math.round(
+                            height * maxSize / width
+                        );
+
+                        width = maxSize;
+
+                    } else {
+
+                        width = Math.round(
+                            width * maxSize / height
+                        );
+
+                        height = maxSize;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+
+                const ctx =
+                    canvas.getContext("2d");
+
+                ctx.fillStyle = "#ffffff";
+
+                ctx.fillRect(
+                    0,
+                    0,
+                    width,
+                    height
+                );
+
+                ctx.drawImage(
+                    img,
+                    0,
+                    0,
+                    width,
+                    height
+                );
+
+                URL.revokeObjectURL(imageURL);
+
+                canvas.toBlob(
+                    function (blob) {
+
+                        if (!blob) {
+
+                            reject(
+                                new Error(
+                                    "Could not convert photo."
+                                )
+                            );
+
+                            return;
+                        }
+
+                        const newFile =
+                            new File(
+                                [blob],
+                                "passport.jpg",
+                                {
+                                    type: "image/jpeg"
+                                }
+                            );
+
+                        resolve(newFile);
+
+                    },
+                    "image/jpeg",
                     0.80
                 );
-            };
 
-            img.onerror = function(){
+            } catch (error) {
+
+                URL.revokeObjectURL(imageURL);
 
                 reject(
                     new Error(
-                        "Could not read the selected photo."
+                        "Could not process selected photo."
                     )
                 );
-            };
-
-            img.src = event.target.result;
+            }
         };
 
-        reader.onerror = function(){
+        img.onerror = function () {
+
+            URL.revokeObjectURL(imageURL);
 
             reject(
                 new Error(
-                    "Could not read selected file."
+                    "Could not open selected photo."
                 )
             );
         };
 
-        reader.readAsDataURL(file);
+        img.src = imageURL;
     });
+}
 }
 
 
