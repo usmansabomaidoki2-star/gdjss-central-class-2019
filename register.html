@@ -314,9 +314,9 @@ form.addEventListener("submit", async function(event) {
 
         /* SAVE TO NEW REGISTRATIONS TABLE */
 
-        const { data, error } = await db
-            .from("registrations")
-            .insert({
+        const { error } = await db
+    .from("registrations")
+    .insert({
 
                 full_name: fullName,
                 phone: phone,
@@ -330,7 +330,7 @@ form.addEventListener("submit", async function(event) {
                 email: email,
                 status: "pending"
 
-            })
+            });
             .select();
 
 
