@@ -424,9 +424,7 @@ form.addEventListener(
                 "Preparing passport photo...";
 
 
-            const photo =
-                await convertToJPEG(
-                    originalPhoto
+            const photo = originalPhoto;
                 );
 
 
@@ -456,14 +454,23 @@ form.addEventListener(
 
 
             const uploadResult =
-                await db.storage
-                .from("passport-photos")
-                .upload(
-                    filePath,
-                    photo,
-                    {
-                        contentType:"image/jpeg",
-                        upsert:false
+    await db.storage
+    .from("passport-photos")
+    .upload(
+        filePath,
+        photo,
+        {
+            contentType: photo.type,
+            upsert: false
+        }
+    );
+
+if(uploadResult.error){
+    throw new Error(
+        "Photo upload failed: " +
+        uploadResult.error.message
+    );
+}
                     }
                 );
 
