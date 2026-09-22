@@ -479,8 +479,7 @@ async function loadMembers(){
 
         const result =
             await supabaseClient
-            .from("Members")
-            .select("*")
+.from("registrations")            .select("*")
             .order("id", {
                 ascending:false
             });
@@ -776,8 +775,7 @@ async function rejectMember(memberId){
     try{
 
         const result =
-            await supabaseClient
-            .from("Members")
+            .from("registrations")
             .update({
                 status:"rejected"
             })
