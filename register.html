@@ -317,18 +317,29 @@ form.addEventListener("submit", async function(event) {
         const { error } = await db
     .from("registrations")
     .insert({
+        full_name: fullName,
+        phone: phone,
+        gender: gender,
+        state: state,
+        city: city,
+        address: address,
+        class_section: classSection,
+        whatsapp: whatsapp,
+        occupation: occupation,
+        email: email,
+        status: "pending"
+    });
 
-                full_name: fullName,
-                phone: phone,
-                gender: gender,
-                state: state,
-                city: city,
-                address: address,
-                class_section: classSection,
-                whatsapp: whatsapp,
-                occupation: occupation,
-                email: email,
-                status: "pending"
+if (error) {
+    console.error("Database error:", error);
+    throw new Error("Database error: " + error.message);
+}
+
+message.className = "success";
+message.textContent =
+    "Registration submitted successfully! Please wait for admin approval.";
+
+form.reset();
 
             });
             .select();
