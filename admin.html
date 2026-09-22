@@ -712,16 +712,54 @@ function renderApprovedMembers(members) {
 
 async function approveMember(memberId) {
 
-    const confirmed =
-        confirm(
-            "Are you sure you want to approve this member?"
-        );
+    const confirmed = confirm(
+        "Are you sure you want to approve this member?"
+    );
 
     if (!confirmed) {
         return;
     }
 
     try {
+
+        const { data, error } =
+            await supabaseClient.rpc(
+                "approve_registration",
+                {
+                    registration_id: memberId
+                }
+            );
+
+        if (error) {
+
+            console.error("Approval error:", error);
+
+            alert(
+                "Approval error: " +
+                error.message
+            );
+
+            return;
+        }
+
+        alert(
+            "Member approved successfully!\n\n" +
+            "Member ID: " +
+            data
+        );
+
+        await loadMembers();
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Error: " +
+            (error.message || "Unknown error")
+        );
+    }
+}
 
         /*
            TEMPORARY APPROVAL
