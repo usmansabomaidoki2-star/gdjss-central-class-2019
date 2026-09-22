@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>GDJSS 2019 - Member Portal</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#f3f6f9;
+    color:#222;
+}
+
+header{
+    background:#0b3d2e;
+    color:white;
+    text-align:center;
+    padding:25px 15px;
+}
+
+header h1{
+    margin:0 0 8px;
+    font-size:24px;
+}
+
+header p{
+    margin:0;
+}
+
+.container{
+    width:95%;
+    max-width:850px;
+    margin:25px auto;
+}
+
+.card{
+    background:white;
+    padding:22px;
+    margin-bottom:20px;
+    border-radius:12px;
+    box-shadow:0 3px 12px rgba(0,0,0,.08);
+}
+
+input{
+    width:100%;
+    padding:14px;
+    margin:8px 0;
+    border:1px solid #ccc;
+    border-radius:7px;
+    font-size:16px;
+}
+
+button{
+    width:100%;
+    padding:14px;
+    margin-top:12px;
+    border:0;
+    border-radius:7px;
+    background:#0b3d2e;
+    color:white;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+button:disabled{
+    background:#777;
+}
+
+.gray{
+    background:#555;
+}
+
+.red{
+    background:#dc3545;
+}
+
+.message{
+    margin-top:15px;
+    text-align:center;
+    font-weight:bold;
+    line-height:1.5;
+}
+
+.error{
+    color:#dc3545;
+}
+
+.success{
+    color:#198754;
+}
+
+.loading{
+    color:#555;
+}
+
+.note{
+    background:#eef8f6;
+    padding:12px;
+    border-radius:8px;
+    margin-bottom:15px;
+    line-height:1.5;
+}
+
+#signupBox{
+    display:none;
+}
+
+#dashboard{
+    display:none;
+}
+
+.profile{
+    text-align:center;
+}
+
+.photo{
+    width:150px;
+    height:150px;
+    object-fit:cover;
+    border-radius:50%;
+    border:4px solid #0b3d2e;
+    display:block;
+    margin:15px auto;
+    background:#eee;
+}
+
+.memberId{
+    display:inline-block;
+    padding:12px 20px;
+    background:#eef8f6;
+    color:#0b3d2e;
+    border-radius:8px;
+    font-size:21px;
+    font-weight:bold;
+}
+
+.approved{
+    color:#198754;
+    font-weight:bold;
+}
+
+.info{
+    padding:14px 0;
+    border-bottom:1px solid #eee;
+}
+
+.info b{
+    display:inline-block;
+    width:160px;
+}
+
+@media(max-width:600px){
+
+    header h1{
+        font-size:20px;
+    }
+
+    .info b{
+        display:block;
+        width:auto;
+        margin-bottom:5px;
+    }
+
+    .photo{
+        width:130px;
+        height:130px;
+    }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<header>
+
+<h1>
+GDJSS CENTRAL CLASS OF 2019
+</h1>
+
+<p>
+Member Portal
+</p>
+
+</header>
+
+
+<div class="container">
+
+
+<!-- =========================
+     LOGIN
+========================= -->
+
+<div id="loginBox" class="card">
+
+<h2>🔐 Member Login</h2>
+
+<div class="note">
+
+Login using the email address and password
+of your GDJSS member account.
+
+</div>
+
+
+<input
+type="email"
+id="loginEmail"
+placeholder="Email Address"
+autocomplete="email"
+>
+
+
+<input
+type="password"
+id="loginPassword"
+placeholder="Password"
+autocomplete="current-password"
+>
+
+
+<button
+type="button"
+id="loginButton"
+>
+Login
+</button>
+
+
+<button
+type="button"
+id="showSignup"
+class="gray"
+>
+Create Member Account
+</button>
+
+
+<div
+id="loginMessage"
+class="message"
+>
+</div>
+
+</div>
+
+
+
+<!-- =========================
+     CREATE ACCOUNT
+========================= -->
+
+<div id="signupBox" class="card">
+
+<h2>📝 Create Member Account</h2>
+
+<div class="note">
+
+Your GDJSS registration must already be
+approved by the administrator.
+
+Use the same email address you used
+during registration.
+
+</div>
+
+
+<input
+type="email"
+id="signupEmail"
+placeholder="Approved Email Address"
+autocomplete="email"
+>
+
+
+<input
+type="password"
+id="signupPassword"
+placeholder="Create Password"
+autocomplete="new-password"
+>
+
+
+<button
+type="button"
+id="signupButton"
+>
+Create Account
+</button>
+
+
+<button
+type="button"
+id="backLogin"
+class="gray"
+>
+Back to Login
+</button>
+
+
+<div
+id="signupMessage"
+class="message"
+>
+</div>
+
+</div>
+
+
+
+<!-- =========================
+     MEMBER DASHBOARD
+========================= -->
+
+<div id="dashboard">
+
+
+<div class="card profile">
+
+<h2>
+👤 My Member Profile
+</h2>
+
+
+<img
+id="photo"
+class="photo"
+alt="Passport Photo"
+>
+
+
+<div
+id="memberId"
+class="memberId"
+>
+Loading...
+</div>
+
+
+<h2 id="fullNameTop">
+Loading...
+</h2>
+
+
+<p class="approved">
+✅ Approved GDJSS Member
+</p>
+
+</div>
+
+
+
+<div class="card">
+
+<h2>
+📋 My Information
+</h2>
+
+
+<div class="info">
+
+<b>Full Name:</b>
+
+<span id="fullName">
+-
+</span>
+
+</div>
+
+
+<div class="info">
+
+<b>Phone:</b>
+
+<span id="phone">
+-
+</span>
+
+</div>
+
+
+<div class="info">
+
+<b>Gender:</b>
+
+<span id="gender">
+-
+</span>
+
+</div>
+
+
+<div class="info">
+
+<b>State:</b>
+
+<span id="state">
+-
+</span>
+
+</div>
+
+
+<div class="info">
+
+<b>City / Town:</b>
+
+<span id="city">
+-
+</span>
+
+</div>
+
+
+<div class="info">
+
+<b>Address:</b>
+
+<span id="address">
+-
+</span>
+
+</div>
+
+
+<div class="info">
+
+<b>Class / Section:</b>
+
+<span id="classSection">
+-
+</span>
+
+</div>
+
+
+<div class="info">
+
+<b>WhatsApp:</b>
+
+<span id="whatsapp">
+-
+</span>
+
+</div>
+
+
+<div class="info">
+
+<b>Occupation:</b>
+
+<span id="occupation">
+-
+</span>
+
+</div>
+
+
+<div class="info">
+
+<b>Email:</b>
+
+<span id="email">
+-
+</span>
+
+</div>
+
+
+</div>
+
+
+
+<div class="card">
+
+<button
+type="button"
+id="logoutButton"
+class="red"
+>
+🚪 Logout
+</button>
+
+</div>
+
+
+</div>
+
+</div>
+
+
+
+<script>
+
+/* =========================================
+   SUPABASE
+========================================= */
+
+const SUPABASE_URL =
+"https://nfivwaxynfcqumupcttp.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_cW8I1UvkW1jvGNDeh_NTPg_QicAc9G7";
+
+
+const supabaseClient =
+window.supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY,
+{
+    auth:{
+        persistSession:true,
+        autoRefreshToken:true,
+        detectSessionInUrl:true
+    }
+}
+);
+
+
+
+/* =========================================
+   ELEMENTS
+========================================= */
+
+const loginBox =
+document.getElementById("loginBox");
+
+const signupBox =
+document.getElementById("signupBox");
+
+const dashboard =
+document.getElementById("dashboard");
+
+
+
+/* =========================================
+   SHOW CREATE ACCOUNT
+========================================= */
+
+document
+.getElementById("showSignup")
+.addEventListener("click",function(){
+
+    loginBox.style.display="none";
+
+    signupBox.style.display="block";
+
+});
+
+
+
+/* =========================================
+   BACK TO LOGIN
+========================================= */
+
+document
+.getElementById("backLogin")
+.addEventListener("click",function(){
+
+    signupBox.style.display="none";
+
+    loginBox.style.display="block";
+
+});
+
+
+
+/* =========================================
+   CREATE ACCOUNT
+========================================= */
+
+document
+.getElementById("signupButton")
+.addEventListener("click",createAccount);
+
+
+async function createAccount(){
+
+    const email =
+    document
+    .getElementById("signupEmail")
+    .value
+    .trim()
+    .toLowerCase();
+
+
+    const password =
+    document
+    .getElementById("signupPassword")
+    .value;
+
+
+    const message =
+    document.getElementById("signupMessage");
+
+
+    message.className="message loading";
+
+    message.textContent=
+    "Checking registration...";
+
+
+    if(!email || !password){
+
+        message.className=
+        "message error";
+
+        message.textContent=
+        "Please enter email and password.";
+
+        return;
+
+    }
+
+
+    if(password.length < 6){
+
+        message.className=
+        "message error";
+
+        message.textContent=
+        "Password must contain at least 6 characters.";
+
+        return;
+
+    }
+
+
+    try{
+
+        /* CHECK APPROVED MEMBER */
+
+        const check =
+        await supabaseClient
+        .from("registrations")
+        .select(
+            "id,full_name,email,status,member_id"
+        )
+        .eq("email",email)
+        .eq("status","approved")
+        .not("member_id","is",null)
+        .order("id",{ascending:false})
+        .limit(1)
+        .maybeSingle();
+
+
+        if(check.error){
+
+            throw check.error;
+
+        }
+
+
+        if(!check.data){
+
+            message.className=
+            "message error";
+
+            message.textContent=
+            "This email is not connected to an approved GDJSS member.";
+
+            return;
+
+        }
+
+
+        /* CREATE AUTH ACCOUNT */
+
+        const result =
+        await supabaseClient.auth.signUp({
+
+            email:email,
+
+            password:password
+
+        });
+
+
+        if(result.error){
+
+            if(
+                result.error.message
+                .toLowerCase()
+                .includes("already")
+            ){
+
+                message.className=
+                "message error";
+
+                message.textContent=
+                "This account already exists. Please login.";
+
+                return;
+
+            }
+
+            throw result.error;
+
+        }
+
+
+        if(
+            result.data.user &&
+            !result.data.session
+        ){
+
+            message.className=
+            "message success";
+
+            message.textContent=
+            "Account created successfully. Check your email, confirm it, then login.";
+
+            return;
+
+        }
+
+
+        if(result.data.session){
+
+            await loadMember();
+
+        }
+
+
+    }catch(error){
+
+        console.error(error);
+
+        message.className=
+        "message error";
+
+        message.textContent=
+        "Error: "+error.message;
+
+    }
+
+}
+
+
+
+/* =========================================
+   LOGIN
+========================================= */
+
+document
+.getElementById("loginButton")
+.addEventListener("click",login);
+
+
+async function login(){
+
+    const email =
+    document
+    .getElementById("loginEmail")
+    .value
+    .trim()
+    .toLowerCase();
+
+
+    const password =
+    document
+    .getElementById("loginPassword")
+    .value;
+
+
+    const message =
+    document.getElementById("loginMessage");
+
+
+    message.className=
+    "message loading";
+
+    message.textContent=
+    "Logging in...";
+
+
+    if(!email || !password){
+
+        message.className=
+        "message error";
+
+        message.textContent=
+        "Please enter email and password.";
+
+        return;
+
+    }
+
+
+    try{
+
+        const result =
+        await supabaseClient.auth
+        .signInWithPassword({
+
+            email:email,
+
+            password:password
+
+        });
+
+
+        if(result.error){
+
+            throw result.error;
+
+        }
+
+
+        await loadMember();
+
+
+    }catch(error){
+
+        console.error(error);
+
+        message.className=
+        "message error";
+
+        message.textContent=
+        error.message;
+
+    }
+
+}
+
+
+
+/* =========================================
+   LOAD MEMBER
+========================================= */
+
+async function loadMember(){
+
+    const sessionResult =
+    await supabaseClient.auth
+    .getSession();
+
+
+    const session =
+    sessionResult.data.session;
+
+
+    if(!session){
+
+        throw new Error(
+            "No active login session."
+        );
+
+    }
+
+
+    const authEmail =
+    (
+        session.user.email || ""
+    )
+    .trim()
+    .toLowerCase();
+
+
+    /*
+       FIND APPROVED MEMBER
+       USING EMAIL
+    */
+
+    const result =
+    await supabaseClient
+    .from("registrations")
+    .select("*")
+    .eq("email",authEmail)
+    .eq("status","approved")
+    .not("member_id","is",null)
+    .order("id",{ascending:false})
+    .limit(1)
+    .maybeSingle();
+
+
+    if(result.error){
+
+        throw result.error;
+
+    }
+
+
+    if(!result.data){
+
+        await supabaseClient.auth.signOut();
+
+        throw new Error(
+            "Your email is not linked to an approved GDJSS member."
+        );
+
+    }
+
+
+    const member =
+    result.data;
+
+
+    /*
+       UPDATE USER_ID
+    */
+
+    if(
+        member.user_id !== session.user.id
+    ){
+
+        const update =
+        await supabaseClient
+        .from("registrations")
+        .update({
+            user_id:session.user.id
+        })
+        .eq("id",member.id);
+
+
+        if(update.error){
+
+            console.error(
+                "User linking error:",
+                update.error
+            );
+
+        }
+
+    }
+
+
+    /*
+       SHOW DASHBOARD
+    */
+
+    showDashboard(member);
+
+}
+
+
+
+/* =========================================
+   SHOW DASHBOARD
+========================================= */
+
+function showDashboard(member){
+
+    loginBox.style.display=
+    "none";
+
+    signupBox.style.display=
+    "none";
+
+    dashboard.style.display=
+    "block";
+
+
+    document.getElementById(
+        "memberId"
+    ).textContent=
+    "🆔 "+(
+        member.member_id ||
+        "No Member ID"
+    );
+
+
+    document.getElementById(
+        "fullNameTop"
+    ).textContent=
+    member.full_name || "-";
+
+
+    document.getElementById(
+        "fullName"
+    ).textContent=
+    member.full_name || "-";
+
+
+    document.getElementById(
+        "phone"
+    ).textContent=
+    member.phone || "-";
+
+
+    document.getElementById(
+        "gender"
+    ).textContent=
+    member.gender || "-";
+
+
+    document.getElementById(
+        "state"
+    ).textContent=
+    member.state || "-";
+
+
+    document.getElementById(
+        "city"
+    ).textContent=
+    member.city || "-";
+
+
+    document.getElementById(
+        "address"
+    ).textContent=
+    member.address || "-";
+
+
+    document.getElementById(
+        "classSection"
+    ).textContent=
+    member.class_section || "-";
+
+
+    document.getElementById(
+        "whatsapp"
+    ).textContent=
+    member.whatsapp || "-";
+
+
+    document.getElementById(
+        "occupation"
+    ).textContent=
+    member.occupation || "-";
+
+
+    document.getElementById(
+        "email"
+    ).textContent=
+    member.email || "-";
+
+
+    const photo =
+    document.getElementById("photo");
+
+
+    if(
+        member.photo_url &&
+        member.photo_url.trim() !== ""
+    ){
+
+        photo.src=
+        member.photo_url;
+
+        photo.style.display=
+        "block";
+
+    }else{
+
+        photo.style.display=
+        "none";
+
+    }
+
+}
+
+
+
+/* =========================================
+   LOGOUT
+========================================= */
+
+document
+.getElementById("logoutButton")
+.addEventListener("click",async function(){
+
+    await supabaseClient.auth.signOut();
+
+    dashboard.style.display=
+    "none";
+
+    signupBox.style.display=
+    "none";
+
+    loginBox.style.display=
+    "block";
+
+    document.getElementById(
+        "loginPassword"
+    ).value="";
+
+    document.getElementById(
+        "loginMessage"
+    ).textContent="";
+
+});
+
+
+
+/* =========================================
+   EXISTING SESSION
+========================================= */
+
+async function checkExistingSession(){
+
+    const result =
+    await supabaseClient.auth
+    .getSession();
+
+
+    if(
+        result.data &&
+        result.data.session
+    ){
+
+        try{
+
+            await loadMember();
+
+        }catch(error){
+
+            console.error(error);
+
+        }
+
+    }
+
+}
+
+
+checkExistingSession();
+
+</script>
+
+</body>
+</html>
