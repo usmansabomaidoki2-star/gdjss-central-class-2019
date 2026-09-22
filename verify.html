@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Member Verification - GDJSS Central Class of 2019</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f5f8;
+            min-height: 100vh;
+            padding: 30px 15px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: auto;
+        }
+
+        .header {
+            background: #0b3d2e;
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .header h1 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            background: #0b3d2e;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #07543d;
+        }
+
+        #result {
+            margin-top: 20px;
+        }
+
+        .success {
+            border: 2px solid #198754;
+            background: #f0fff6;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .success h2 {
+            color: #198754;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .row {
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .row:last-child {
+            border-bottom: none;
+        }
+
+        .row strong {
+            display: inline-block;
+            width: 120px;
+        }
+
+        .not-found {
+            background: #fff3f3;
+            color: #b00020;
+            border: 1px solid #ffb3b3;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <h1>GDJSS CENTRAL CLASS OF 2019</h1>
+        <p>Member Verification</p>
+    </div>
+
+    <div class="card">
+
+        <label for="memberId">Enter Member ID</label>
+
+        <input
+            type="text"
+            id="memberId"
+            placeholder="GDJSS-2019-0001"
+        >
+
+        <button type="button" id="verifyButton">
+            Verify Member
+        </button>
+
+        <div id="result"></div>
+
+    </div>
+
+    <div class="footer">
+        GDJSS Central Class of 2019 Association
+    </div>
+
+</div>
+
+<script>
+
+const SUPABASE_URL =
+    "https://nfivwaxynfcqumupcttp.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_cW8I1UvkW1jvGNDeh_NTPg_QicAc9G7";
+
+const db = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+
+document.getElementById("verifyButton")
+.addEventListener("click", verifyMember);
+
+
+async function verifyMember() {
+
+    const input =
+        document.getElementById("memberId");
+
+    const result =
+        document.getElementById("result");
+
+    const memberId =
+        input.value.trim().toUpperCase();
+
+
+    if (!memberId) {
+
+        result.innerHTML = `
+            <div class="not-found">
+                Please enter a Member ID.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    result.innerHTML = `
+        <p style="text-align:center;">
+            Verifying...
+        </p>
+    `;
+
+
+    const { data, error } =
+        await db.rpc(
+            "verify_member",
+            {
+                member_id_input: memberId
+            }
+        );
+
+
+    if (error) {
+
+        console.error(error);
+
+        result.innerHTML = `
+            <div class="not-found">
+                Verification failed. Please try again.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    if (!data || data.length === 0) {
+
+        result.innerHTML = `
+            <div class="not-found">
+                <strong>Member Not Found</strong><br><br>
+                This Member ID does not exist or has not been approved.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    const member = data[0];
+
+
+    result.innerHTML = `
+
+        <div class="success">
+
+            <h2>✓ Member Verified</h2>
+
+            <div class="row">
+                <strong>Name:</strong>
+                ${escapeHtml(member.full_name)}
+            </div>
+
+            <div class="row">
+                <strong>Member ID:</strong>
+                ${escapeHtml(member.member_id)}
+            </div>
+
+            <div class="row">
+                <strong>Status:</strong>
+                Approved
+            </div>
+
+            <div class="row">
+                <strong>Class:</strong>
+                ${escapeHtml(member.class_section || "-")}
+            </div>
+
+            <div class="row">
+                <strong>State:</strong>
+                ${escapeHtml(member.state || "-")}
+            </div>
+
+            <div class="row">
+                <strong>City:</strong>
+                ${escapeHtml(member.city || "-")}
+            </div>
+
+        </div>
+    `;
+}
+
+
+function escapeHtml(value) {
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+</script>
+
+</body>
+</html>
