@@ -174,9 +174,9 @@ button:disabled {
         <input type="email" id="email"
             placeholder="Enter email address">
 
-        <button type="submit" id="submitButton">
-            Submit Registration
-        </button>
+        <button type="button" id="submitButton">
+    Submit Registration
+</button>
 
         <div id="message"></div>
 
@@ -208,9 +208,7 @@ const form = document.getElementById("registrationForm");
 const message = document.getElementById("message");
 const submitButton = document.getElementById("submitButton");
 
-form.addEventListener("submit", async function(event) {
-
-    event.preventDefault();
+submitButton.addEventListener("click", async function() {
 
     message.className = "loading";
     message.textContent = "Submitting registration...";
