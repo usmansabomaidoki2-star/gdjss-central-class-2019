@@ -1,0 +1,1580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>GDJSS Central Class of 2021 - Member Dashboard</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#f3f6f9;
+    color:#222;
+}
+
+header{
+    background:#0b3d2e;
+    color:white;
+    text-align:center;
+    padding:25px 15px;
+}
+
+header h1{margin:0 0 8px;font-size:24px}
+header p{margin:0}
+
+.container{
+    width:95%;
+    max-width:900px;
+    margin:25px auto;
+}
+
+.card{
+    background:white;
+    padding:22px;
+    margin-bottom:20px;
+    border-radius:12px;
+    box-shadow:0 3px 12px rgba(0,0,0,.08);
+}
+
+button{
+    width:100%;
+    padding:14px;
+    margin-top:12px;
+    border:0;
+    border-radius:7px;
+    background:#0b3d2e;
+    color:white;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+button:disabled{background:#777}
+
+.blue{background:#1769aa}
+.orange{background:#f39c12}
+.red{background:#dc3545}
+.gray{background:#555}
+
+input{
+    width:100%;
+    padding:13px;
+    margin:7px 0 12px;
+    border:1px solid #ccc;
+    border-radius:7px;
+    font-size:16px;
+}
+
+label{
+    display:block;
+    font-weight:bold;
+    margin-top:8px;
+}
+
+.note{
+    background:#eef8f6;
+    padding:12px;
+    border-radius:8px;
+    margin-bottom:15px;
+    line-height:1.5;
+}
+
+.message{
+    margin-top:15px;
+    text-align:center;
+    font-weight:bold;
+    line-height:1.5;
+}
+
+.success{color:#198754}
+.error{color:#dc3545}
+.loading{color:#555}
+
+#dashboard{display:none}
+#editProfileBox{display:none}
+
+.profile{text-align:center}
+
+.photo{
+    width:150px;
+    height:150px;
+    object-fit:cover;
+    border-radius:50%;
+    border:4px solid #0b3d2e;
+    display:block;
+    margin:15px auto;
+    background:#eee;
+}
+
+.memberId{
+    display:inline-block;
+    padding:12px 20px;
+    background:#eef8f6;
+    color:#0b3d2e;
+    border-radius:8px;
+    font-size:21px;
+    font-weight:bold;
+}
+
+.approved{
+    color:#198754;
+    font-weight:bold;
+}
+
+.info{
+    padding:14px 0;
+    border-bottom:1px solid #eee;
+}
+
+.info b{
+    display:inline-block;
+    width:160px;
+}
+
+.photo-preview{
+    width:130px;
+    height:130px;
+    object-fit:cover;
+    border-radius:50%;
+    border:4px solid #0b3d2e;
+    display:block;
+    margin:15px auto;
+    background:#eee;
+}
+
+.file-label{
+    display:block;
+    background:#eef8f6;
+    color:#0b3d2e;
+    border:2px dashed #0b3d2e;
+    padding:15px;
+    text-align:center;
+    border-radius:8px;
+    cursor:pointer;
+    margin-top:10px;
+    font-weight:bold;
+}
+
+#photoInput{display:none}
+
+
+/* DIGITAL ID CARD */
+
+.id-card-wrap{
+    display:flex;
+    justify-content:center;
+    margin-top:20px;
+}
+
+.id-card{
+    width:100%;
+    max-width:620px;
+    min-height:340px;
+    border-radius:20px;
+    overflow:hidden;
+    background:white;
+    border:3px solid #0b3d2e;
+    box-shadow:0 8px 25px rgba(0,0,0,.18);
+}
+
+.id-card-header{
+    background:#0b3d2e;
+    color:white;
+    text-align:center;
+    padding:18px 12px;
+}
+
+.id-card-header h2{
+    margin:0;
+    font-size:21px;
+}
+
+.id-card-header p{
+    margin:6px 0 0;
+    font-size:13px;
+}
+
+.id-card-body{
+    display:flex;
+    gap:20px;
+    padding:25px;
+    align-items:center;
+}
+
+.id-card-photo{
+    width:125px;
+    height:145px;
+    object-fit:cover;
+    border-radius:10px;
+    border:3px solid #0b3d2e;
+    background:#eee;
+    flex-shrink:0;
+}
+
+.id-details{flex:1}
+
+.id-details h2{
+    margin:0 0 12px;
+    color:#0b3d2e;
+    font-size:21px;
+}
+
+.id-row{
+    margin:8px 0;
+    font-size:14px;
+}
+
+.id-row strong{color:#0b3d2e}
+
+.id-number{
+    margin-top:15px;
+    padding:10px;
+    background:#eef8f6;
+    border-radius:7px;
+    text-align:center;
+    color:#0b3d2e;
+    font-size:18px;
+    font-weight:bold;
+}
+
+.id-card-footer{
+    background:#f1f1f1;
+    padding:12px;
+    text-align:center;
+    font-size:12px;
+    color:#555;
+}
+
+@media(max-width:600px){
+
+    header h1{font-size:20px}
+
+    .info b{
+        display:block;
+        width:auto;
+        margin-bottom:5px;
+    }
+
+    .photo{
+        width:130px;
+        height:130px;
+    }
+
+    .id-card-body{
+        flex-direction:column;
+        text-align:center;
+    }
+
+    .id-details{width:100%}
+}
+
+
+/* PRINT */
+
+@media print{
+
+    body{background:white}
+
+    body *{visibility:hidden}
+
+    #printCard,
+    #printCard *{
+        visibility:visible;
+    }
+
+    #printCard{
+        position:absolute;
+        left:0;
+        top:0;
+        width:100%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>GDJSS CENTRAL CLASS OF 2021</h1>
+    <p>Member Portal</p>
+</header>
+
+<div class="container">
+
+<div id="dashboard">
+
+    <!-- PROFILE -->
+
+    <div class="card profile">
+
+        <h2>👤 My Member Profile</h2>
+
+        <img
+            id="photo"
+            class="photo"
+            alt="Passport Photo"
+        >
+
+        <div id="memberId" class="memberId">
+            Loading...
+        </div>
+
+        <h2 id="fullNameTop">Loading...</h2>
+
+        <p class="approved">
+            ✅ Approved GDJSS Member
+        </p>
+
+        <button
+            type="button"
+            class="orange"
+            id="editButton"
+        >
+            ✏️ Edit Profile
+        </button>
+
+    </div>
+
+
+    <!-- EDIT PROFILE -->
+
+    <div id="editProfileBox" class="card">
+
+        <h2>✏️ Edit My Profile</h2>
+
+        <div class="note">
+            You can update your personal information
+            and change your passport photo.
+        </div>
+
+        <label>Full Name</label>
+        <input type="text" id="editFullName">
+
+        <label>Phone Number</label>
+        <input type="text" id="editPhone">
+
+        <label>Gender</label>
+        <input type="text" id="editGender">
+
+        <label>State</label>
+        <input type="text" id="editState">
+
+        <label>City / Town</label>
+        <input type="text" id="editCity">
+
+        <label>Current Address</label>
+        <input type="text" id="editAddress">
+
+        <label>Class / Section</label>
+        <input type="text" id="editClassSection">
+
+        <label>WhatsApp Number</label>
+        <input type="text" id="editWhatsapp">
+
+        <label>Occupation</label>
+        <input type="text" id="editOccupation">
+
+
+        <h3>📸 Change Passport Photo</h3>
+
+        <img
+            id="photoPreview"
+            class="photo-preview"
+            alt="Photo Preview"
+        >
+
+        <label
+            for="photoInput"
+            class="file-label"
+        >
+            📸 Choose New Passport Photo
+        </label>
+
+        <input
+            type="file"
+            id="photoInput"
+            accept="image/jpeg,image/png,image/webp"
+        >
+
+        <div id="editMessage" class="message"></div>
+
+        <button
+            type="button"
+            id="saveChangesButton"
+        >
+            💾 Save Changes
+        </button>
+
+        <button
+            type="button"
+            id="cancelEditButton"
+            class="gray"
+        >
+            Cancel
+        </button>
+
+    </div>
+
+
+    <!-- DIGITAL ID CARD -->
+
+    <div class="card">
+
+        <h2>🪪 My Digital Member ID Card</h2>
+
+        <p>
+            This is your official digital member identification card.
+        </p>
+
+        <div id="printCard" class="id-card-wrap">
+
+            <div class="id-card">
+
+                <div class="id-card-header">
+
+                    <h2>
+                        GDJSS CENTRAL CLASS OF 2021
+                    </h2>
+
+                    <p>
+                        OFFICIAL MEMBER IDENTIFICATION CARD
+                    </p>
+
+                </div>
+
+                <div class="id-card-body">
+
+                    <img
+                        id="cardPhoto"
+                        class="id-card-photo"
+                        alt="Member Passport"
+                    >
+
+                    <div class="id-details">
+
+                        <h2 id="cardName">
+                            Member Name
+                        </h2>
+
+                        <div class="id-row">
+                            <strong>Class:</strong>
+                            <span id="cardClass">-</span>
+                        </div>
+
+                        <div class="id-row">
+                            <strong>State:</strong>
+                            <span id="cardState">-</span>
+                        </div>
+
+                        <div class="id-row">
+                            <strong>Status:</strong>
+                            <span>Approved Member</span>
+                        </div>
+
+                        <div class="id-number">
+                            🆔
+                            <span id="cardMemberId">-</span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="id-card-footer">
+
+                    GDJSS CENTRAL CLASS OF 2021
+                    <br>
+                    Official Member Card
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <button
+            type="button"
+            class="blue"
+            id="printButton"
+        >
+            🖨️ Print / Save ID Card
+        </button>
+
+    </div>
+
+
+    <!-- INFORMATION -->
+
+    <div class="card">
+
+        <h2>📋 My Information</h2>
+
+        <div class="info">
+            <b>Full Name:</b>
+            <span id="fullName">-</span>
+        </div>
+
+        <div class="info">
+            <b>Phone:</b>
+            <span id="phone">-</span>
+        </div>
+
+        <div class="info">
+            <b>Gender:</b>
+            <span id="gender">-</span>
+        </div>
+
+        <div class="info">
+            <b>State:</b>
+            <span id="state">-</span>
+        </div>
+
+        <div class="info">
+            <b>City / Town:</b>
+            <span id="city">-</span>
+        </div>
+
+        <div class="info">
+            <b>Address:</b>
+            <span id="address">-</span>
+        </div>
+
+        <div class="info">
+            <b>Class / Section:</b>
+            <span id="classSection">-</span>
+        </div>
+
+        <div class="info">
+            <b>WhatsApp:</b>
+            <span id="whatsapp">-</span>
+        </div>
+
+        <div class="info">
+            <b>Occupation:</b>
+            <span id="occupation">-</span>
+        </div>
+
+        <div class="info">
+            <b>Email:</b>
+            <span id="email">-</span>
+        </div>
+
+    </div>
+
+
+    <!-- LOGOUT -->
+
+    <div class="card">
+
+        <button
+            type="button"
+            id="logoutButton"
+            class="red"
+        >
+            🚪 Logout
+        </button>
+
+    </div>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   SUPABASE
+===================================================== */
+
+const SUPABASE_URL =
+"https://nfivwaxynfcqumupcttp.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_cW8I1UvkW1jvGNDeh_NTPg_QicAc9G7";
+
+const supabaseClient =
+window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY,
+    {
+        auth:{
+            persistSession:true,
+            autoRefreshToken:true,
+            detectSessionInUrl:true
+        }
+    }
+);
+
+
+/* =====================================================
+   VARIABLES
+===================================================== */
+
+let currentMember = null;
+let selectedPhoto = null;
+
+
+/* =====================================================
+   LOAD MEMBER
+===================================================== */
+
+async function loadMember(){
+
+    const sessionResult =
+        await supabaseClient.auth.getSession();
+
+    const session =
+        sessionResult.data.session;
+
+
+    if(!session){
+
+        window.location.href =
+            "member-login.html";
+
+        return;
+    }
+
+
+    const userId =
+        session.user.id;
+
+
+    /*
+       First get the member account.
+    */
+
+    const accountResult =
+        await supabaseClient
+        .from("member_accounts")
+        .select("member_id,is_active")
+        .eq("user_id",userId)
+        .maybeSingle();
+
+
+    if(accountResult.error){
+
+        console.error(accountResult.error);
+
+        alert(
+            "Unable to load member account."
+        );
+
+        return;
+    }
+
+
+    if(
+        !accountResult.data ||
+        accountResult.data.is_active !== true
+    ){
+
+        await supabaseClient.auth.signOut();
+
+        alert(
+            "This account is not linked to an active GDJSS member account."
+        );
+
+        window.location.href =
+            "member-login.html";
+
+        return;
+    }
+
+
+    const memberId =
+        accountResult.data.member_id;
+
+
+    /*
+       Get registration using member ID.
+    */
+
+    const memberResult =
+        await supabaseClient
+        .from("registrations")
+        .select("*")
+        .eq("member_id",memberId)
+        .eq("status","approved")
+        .maybeSingle();
+
+
+    if(memberResult.error){
+
+        console.error(memberResult.error);
+
+        alert(
+            "Unable to load member profile."
+        );
+
+        return;
+    }
+
+
+    if(!memberResult.data){
+
+        alert(
+            "Approved member profile was not found."
+        );
+
+        return;
+    }
+
+
+    currentMember =
+        memberResult.data;
+
+
+    showDashboard(
+        currentMember
+    );
+}
+
+
+/* =====================================================
+   SHOW DASHBOARD
+===================================================== */
+
+function showDashboard(member){
+
+    document.getElementById(
+        "dashboard"
+    ).style.display =
+        "block";
+
+
+    document.getElementById(
+        "memberId"
+    ).textContent =
+        "🆔 " +
+        (
+            member.member_id ||
+            "No Member ID"
+        );
+
+
+    document.getElementById(
+        "fullNameTop"
+    ).textContent =
+        member.full_name || "-";
+
+
+    document.getElementById(
+        "fullName"
+    ).textContent =
+        member.full_name || "-";
+
+
+    document.getElementById(
+        "phone"
+    ).textContent =
+        member.phone || "-";
+
+
+    document.getElementById(
+        "gender"
+    ).textContent =
+        member.gender || "-";
+
+
+    document.getElementById(
+        "state"
+    ).textContent =
+        member.state || "-";
+
+
+    document.getElementById(
+        "city"
+    ).textContent =
+        member.city || "-";
+
+
+    document.getElementById(
+        "address"
+    ).textContent =
+        member.address || "-";
+
+
+    document.getElementById(
+        "classSection"
+    ).textContent =
+        member.class_section || "-";
+
+
+    document.getElementById(
+        "whatsapp"
+    ).textContent =
+        member.whatsapp || "-";
+
+
+    document.getElementById(
+        "occupation"
+    ).textContent =
+        member.occupation || "-";
+
+
+    document.getElementById(
+        "email"
+    ).textContent =
+        member.email || "-";
+
+
+    /*
+       PHOTO
+    */
+
+    const photo =
+        document.getElementById("photo");
+
+    const cardPhoto =
+        document.getElementById("cardPhoto");
+
+
+    if(
+        member.photo_url &&
+        member.photo_url.trim() !== ""
+    ){
+
+        photo.src =
+            member.photo_url;
+
+        cardPhoto.src =
+            member.photo_url;
+
+        photo.style.display =
+            "block";
+
+        cardPhoto.style.display =
+            "block";
+
+    }else{
+
+        photo.style.display =
+            "none";
+
+        cardPhoto.style.display =
+            "none";
+    }
+
+
+    /*
+       DIGITAL ID
+    */
+
+    document.getElementById(
+        "cardName"
+    ).textContent =
+        member.full_name || "-";
+
+
+    document.getElementById(
+        "cardClass"
+    ).textContent =
+        member.class_section || "-";
+
+
+    document.getElementById(
+        "cardState"
+    ).textContent =
+        member.state || "-";
+
+
+    document.getElementById(
+        "cardMemberId"
+    ).textContent =
+        member.member_id || "-";
+}
+
+
+/* =====================================================
+   EDIT PROFILE
+===================================================== */
+
+document
+.getElementById("editButton")
+.addEventListener(
+    "click",
+    function(){
+
+        if(!currentMember){
+            return;
+        }
+
+
+        document.getElementById(
+            "editFullName"
+        ).value =
+            currentMember.full_name || "";
+
+
+        document.getElementById(
+            "editPhone"
+        ).value =
+            currentMember.phone || "";
+
+
+        document.getElementById(
+            "editGender"
+        ).value =
+            currentMember.gender || "";
+
+
+        document.getElementById(
+            "editState"
+        ).value =
+            currentMember.state || "";
+
+
+        document.getElementById(
+            "editCity"
+        ).value =
+            currentMember.city || "";
+
+
+        document.getElementById(
+            "editAddress"
+        ).value =
+            currentMember.address || "";
+
+
+        document.getElementById(
+            "editClassSection"
+        ).value =
+            currentMember.class_section || "";
+
+
+        document.getElementById(
+            "editWhatsapp"
+        ).value =
+            currentMember.whatsapp || "";
+
+
+        document.getElementById(
+            "editOccupation"
+        ).value =
+            currentMember.occupation || "";
+
+
+        const preview =
+            document.getElementById(
+                "photoPreview"
+            );
+
+
+        if(
+            currentMember.photo_url &&
+            currentMember.photo_url.trim() !== ""
+        ){
+
+            preview.src =
+                currentMember.photo_url;
+
+        }else{
+
+            preview.removeAttribute("src");
+        }
+
+
+        selectedPhoto =
+            null;
+
+
+        document.getElementById(
+            "photoInput"
+        ).value = "";
+
+
+        document.getElementById(
+            "editMessage"
+        ).textContent = "";
+
+
+        document.getElementById(
+            "editProfileBox"
+        ).style.display =
+            "block";
+
+
+        document.getElementById(
+            "editProfileBox"
+        ).scrollIntoView({
+            behavior:"smooth"
+        });
+
+    }
+);
+
+
+/* =====================================================
+   PHOTO SELECT
+===================================================== */
+
+document
+.getElementById("photoInput")
+.addEventListener(
+    "change",
+    function(event){
+
+        const file =
+            event.target.files[0];
+
+
+        if(!file){
+            selectedPhoto = null;
+            return;
+        }
+
+
+        if(!file.type.startsWith("image/")){
+
+            showEditError(
+                "Please choose an image file."
+            );
+
+            event.target.value = "";
+            selectedPhoto = null;
+
+            return;
+        }
+
+
+        if(file.size > 5 * 1024 * 1024){
+
+            showEditError(
+                "Photo must not be larger than 5MB."
+            );
+
+            event.target.value = "";
+            selectedPhoto = null;
+
+            return;
+        }
+
+
+        selectedPhoto =
+            file;
+
+
+        document.getElementById(
+            "photoPreview"
+        ).src =
+            URL.createObjectURL(file);
+
+
+        document.getElementById(
+            "editMessage"
+        ).textContent = "";
+
+    }
+);
+
+
+/* =====================================================
+   SAVE CHANGES
+===================================================== */
+
+document
+.getElementById("saveChangesButton")
+.addEventListener(
+    "click",
+    saveChanges
+);
+
+
+async function saveChanges(){
+
+    if(!currentMember){
+        return;
+    }
+
+
+    const button =
+        document.getElementById(
+            "saveChangesButton"
+        );
+
+    const message =
+        document.getElementById(
+            "editMessage"
+        );
+
+
+    button.disabled = true;
+
+    message.className =
+        "message loading";
+
+    message.textContent =
+        "Saving changes...";
+
+
+    try{
+
+        const sessionResult =
+            await supabaseClient.auth.getSession();
+
+        const session =
+            sessionResult.data.session;
+
+
+        if(!session){
+
+            throw new Error(
+                "Your session has expired. Please login again."
+            );
+        }
+
+
+        /*
+           PHOTO
+        */
+
+        let photoUrl =
+            currentMember.photo_url || "";
+
+
+        if(selectedPhoto){
+
+            message.textContent =
+                "Uploading passport photo...";
+
+
+            /*
+               Use JPG filename regardless
+               of original filename.
+            */
+
+            const fileName =
+                session.user.id +
+                "-" +
+                Date.now() +
+                ".jpg";
+
+
+            /*
+               Convert image to JPG.
+            */
+
+            const jpgFile =
+                await convertToJpg(
+                    selectedPhoto
+                );
+
+
+            const upload =
+                await supabaseClient
+                .storage
+                .from("member-photos")
+                .upload(
+                    fileName,
+                    jpgFile,
+                    {
+                        cacheControl:"3600",
+                        upsert:false,
+                        contentType:"image/jpeg"
+                    }
+                );
+
+
+            if(upload.error){
+
+                throw upload.error;
+            }
+
+
+            const publicUrl =
+                supabaseClient
+                .storage
+                .from("member-photos")
+                .getPublicUrl(
+                    fileName
+                );
+
+
+            photoUrl =
+                publicUrl.data.publicUrl;
+        }
+
+
+        /*
+           UPDATE REGISTRATION
+        */
+
+        message.textContent =
+            "Updating profile...";
+
+
+        const updateData = {
+
+            full_name:
+                document.getElementById(
+                    "editFullName"
+                ).value.trim(),
+
+            phone:
+                document.getElementById(
+                    "editPhone"
+                ).value.trim(),
+
+            gender:
+                document.getElementById(
+                    "editGender"
+                ).value.trim(),
+
+            state:
+                document.getElementById(
+                    "editState"
+                ).value.trim(),
+
+            city:
+                document.getElementById(
+                    "editCity"
+                ).value.trim(),
+
+            address:
+                document.getElementById(
+                    "editAddress"
+                ).value.trim(),
+
+            class_section:
+                document.getElementById(
+                    "editClassSection"
+                ).value.trim(),
+
+            whatsapp:
+                document.getElementById(
+                    "editWhatsapp"
+                ).value.trim(),
+
+            occupation:
+                document.getElementById(
+                    "editOccupation"
+                ).value.trim(),
+
+            photo_url:
+                photoUrl
+        };
+
+
+        const updateResult =
+            await supabaseClient
+            .from("registrations")
+            .update(updateData)
+            .eq(
+                "id",
+                currentMember.id
+            );
+
+
+        if(updateResult.error){
+
+            throw updateResult.error;
+        }
+
+
+        /*
+           GET FRESH MEMBER DATA
+        */
+
+        const freshResult =
+            await supabaseClient
+            .from("registrations")
+            .select("*")
+            .eq(
+                "id",
+                currentMember.id
+            )
+            .maybeSingle();
+
+
+        if(freshResult.error){
+
+            throw freshResult.error;
+        }
+
+
+        currentMember =
+            freshResult.data;
+
+
+        showDashboard(
+            currentMember
+        );
+
+
+        document.getElementById(
+            "editProfileBox"
+        ).style.display =
+            "none";
+
+
+        alert(
+            "✅ Profile updated successfully!"
+        );
+
+
+    }catch(error){
+
+        console.error(error);
+
+        message.className =
+            "message error";
+
+        message.textContent =
+            "❌ " +
+            (
+                error.message ||
+                "Unable to save changes."
+            );
+
+    }finally{
+
+        button.disabled =
+            false;
+    }
+}
+
+
+/* =====================================================
+   CONVERT PHOTO TO JPG
+===================================================== */
+
+function convertToJpg(file){
+
+    return new Promise(
+        function(resolve,reject){
+
+            const reader =
+                new FileReader();
+
+
+            reader.onload =
+                function(event){
+
+                    const img =
+                        new Image();
+
+
+                    img.onload =
+                        function(){
+
+                            const canvas =
+                                document.createElement(
+                                    "canvas"
+                                );
+
+
+                            const maxSize = 1200;
+
+                            let width =
+                                img.width;
+
+                            let height =
+                                img.height;
+
+
+                            if(width > maxSize){
+
+                                height =
+                                    height *
+                                    maxSize /
+                                    width;
+
+                                width =
+                                    maxSize;
+                            }
+
+
+                            if(height > maxSize){
+
+                                width =
+                                    width *
+                                    maxSize /
+                                    height;
+
+                                height =
+                                    maxSize;
+                            }
+
+
+                            canvas.width =
+                                width;
+
+                            canvas.height =
+                                height;
+
+
+                            const ctx =
+                                canvas.getContext(
+                                    "2d"
+                                );
+
+
+                            ctx.drawImage(
+                                img,
+                                0,
+                                0,
+                                width,
+                                height
+                            );
+
+
+                            canvas.toBlob(
+                                function(blob){
+
+                                    if(blob){
+
+                                        resolve(
+                                            blob
+                                        );
+
+                                    }else{
+
+                                        reject(
+                                            new Error(
+                                                "Could not process image."
+                                            )
+                                        );
+                                    }
+
+                                },
+                                "image/jpeg",
+                                0.85
+                            );
+
+                        };
+
+
+                    img.onerror =
+                        function(){
+
+                            reject(
+                                new Error(
+                                    "Unable to read image."
+                                )
+                            );
+                        };
+
+
+                    img.src =
+                        event.target.result;
+                };
+
+
+            reader.onerror =
+                function(){
+
+                    reject(
+                        new Error(
+                            "Unable to read selected photo."
+                        )
+                    );
+                };
+
+
+            reader.readAsDataURL(file);
+        }
+    );
+}
+
+
+/* =====================================================
+   EDIT ERROR
+===================================================== */
+
+function showEditError(text){
+
+    const message =
+        document.getElementById(
+            "editMessage"
+        );
+
+    message.className =
+        "message error";
+
+    message.textContent =
+        text;
+}
+
+
+/* =====================================================
+   CANCEL EDIT
+===================================================== */
+
+document
+.getElementById("cancelEditButton")
+.addEventListener(
+    "click",
+    function(){
+
+        document.getElementById(
+            "editProfileBox"
+        ).style.display =
+            "none";
+
+        selectedPhoto =
+            null;
+
+        document.getElementById(
+            "editMessage"
+        ).textContent = "";
+
+    }
+);
+
+
+/* =====================================================
+   PRINT
+===================================================== */
+
+document
+.getElementById("printButton")
+.addEventListener(
+    "click",
+    function(){
+
+        window.print();
+
+    }
+);
+
+
+/* =====================================================
+   LOGOUT
+===================================================== */
+
+document
+.getElementById("logoutButton")
+.addEventListener(
+    "click",
+    async function(){
+
+        await supabaseClient.auth.signOut();
+
+        currentMember =
+            null;
+
+        window.location.href =
+            "member-login.html";
+
+    }
+);
+
+
+/* =====================================================
+   START
+===================================================== */
+
+loadMember();
+
+</script>
+
+</body>
+</html>
