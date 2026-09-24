@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>GDJSS 2021 Member ID Card</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    padding:25px 15px;
+    font-family:Arial,sans-serif;
+    background:#eef2f3;
+    color:#222;
+}
+
+.container{
+    max-width:520px;
+    margin:auto;
+}
+
+.search-box{
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    margin-bottom:20px;
+    box-shadow:0 4px 15px rgba(0,0,0,.08);
+}
+
+.search-box h2{
+    text-align:center;
+    margin-top:0;
+    color:#0b3d2e;
+}
+
+input{
+    width:100%;
+    padding:14px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    font-size:16px;
+    margin-bottom:12px;
+    text-transform:uppercase;
+}
+
+button{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:8px;
+    background:#0b3d2e;
+    color:white;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#07543d;
+}
+
+#message{
+    text-align:center;
+    margin:15px 0;
+    line-height:1.5;
+}
+
+/* ID CARD */
+
+.id-card{
+    display:none;
+    width:100%;
+    background:white;
+    border-radius:16px;
+    overflow:hidden;
+    box-shadow:0 5px 25px rgba(0,0,0,.15);
+    border:3px solid #0b3d2e;
+}
+
+.card-header{
+    background:#0b3d2e;
+    color:white;
+    text-align:center;
+    padding:18px 10px;
+}
+
+.card-header h1{
+    font-size:18px;
+    margin:0 0 6px;
+}
+
+.card-header p{
+    margin:0;
+    font-size:12px;
+}
+
+.card-body{
+    padding:22px;
+}
+
+/* PHOTO */
+
+.photo-wrap{
+    text-align:center;
+    margin-bottom:18px;
+}
+
+.photo{
+    width:115px;
+    height:135px;
+    object-fit:cover;
+    border:3px solid #0b3d2e;
+    border-radius:8px;
+    background:#f5f5f5;
+}
+
+.no-photo{
+    width:115px;
+    height:135px;
+    border:2px solid #0b3d2e;
+    border-radius:8px;
+    margin:auto;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    color:#777;
+    font-size:12px;
+    background:#f5f5f5;
+}
+
+.member-name{
+    text-align:center;
+    font-size:21px;
+    font-weight:bold;
+    color:#0b3d2e;
+    margin-bottom:18px;
+}
+
+.info{
+    border-top:1px solid #ddd;
+    padding:11px 0;
+    font-size:15px;
+}
+
+.info strong{
+    display:inline-block;
+    width:120px;
+}
+
+.member-id{
+    font-weight:bold;
+    color:#0b3d2e;
+}
+
+.approved{
+    color:#198754;
+    font-weight:bold;
+}
+
+.card-footer{
+    background:#f1f5f3;
+    padding:12px;
+    text-align:center;
+    font-size:11px;
+    color:#555;
+}
+
+.print-button{
+    margin-top:15px;
+}
+
+.back-button{
+    margin-top:10px;
+    background:#555;
+}
+
+.not-found{
+    color:#b00020;
+    background:#fff1f1;
+    padding:12px;
+    border-radius:8px;
+}
+
+.success{
+    color:#198754;
+    font-weight:bold;
+}
+
+/* PRINT */
+
+@media print{
+
+    body{
+        background:white;
+        padding:0;
+    }
+
+    .search-box,
+    #message,
+    .print-button,
+    .back-button{
+        display:none !important;
+    }
+
+    .container{
+        max-width:100%;
+    }
+
+    .id-card{
+        display:block !important;
+        box-shadow:none;
+        width:500px;
+        margin:20px auto;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- SEARCH -->
+
+    <div class="search-box">
+
+        <h2>
+            GDJSS 2021 MEMBER ID CARD
+        </h2>
+
+        <input
+            type="text"
+            id="memberId"
+            placeholder="GDJSS-2021-0001"
+            autocomplete="off"
+        >
+
+        <button
+            type="button"
+            onclick="loadMember()"
+        >
+            View Member Card
+        </button>
+
+    </div>
+
+
+    <div id="message"></div>
+
+
+    <!-- ID CARD -->
+
+    <div
+        class="id-card"
+        id="idCard"
+    >
+
+        <div class="card-header">
+
+            <h1>
+                GDJSS CENTRAL CLASS OF 2021
+            </h1>
+
+            <p>
+                ASSOCIATION MEMBER ID CARD
+            </p>
+
+        </div>
+
+
+        <div class="card-body">
+
+
+            <!-- PHOTO -->
+
+            <div class="photo-wrap">
+
+                <img
+                    id="memberPhoto"
+                    class="photo"
+                    alt="Member Passport Photo"
+                    style="display:none;"
+                >
+
+                <div
+                    id="noPhoto"
+                    class="no-photo"
+                >
+                    PASSPORT<br>
+                    PHOTO
+                </div>
+
+            </div>
+
+
+            <!-- NAME -->
+
+            <div
+                class="member-name"
+                id="memberName"
+            >
+                -
+            </div>
+
+
+            <!-- MEMBER ID -->
+
+            <div class="info">
+
+                <strong>
+                    Member ID:
+                </strong>
+
+                <span
+                    id="cardMemberId"
+                    class="member-id"
+                >
+                    -
+                </span>
+
+            </div>
+
+
+            <!-- STATUS -->
+
+            <div class="info">
+
+                <strong>
+                    Status:
+                </strong>
+
+                <span class="approved">
+                    APPROVED
+                </span>
+
+            </div>
+
+
+            <!-- CLASS -->
+
+            <div class="info">
+
+                <strong>
+                    Class:
+                </strong>
+
+                <span id="memberClass">
+                    -
+                </span>
+
+            </div>
+
+
+            <!-- STATE -->
+
+            <div class="info">
+
+                <strong>
+                    State:
+                </strong>
+
+                <span id="memberState">
+                    -
+                </span>
+
+            </div>
+
+
+            <!-- CITY -->
+
+            <div class="info">
+
+                <strong>
+                    City:
+                </strong>
+
+                <span id="memberCity">
+                    -
+                </span>
+
+            </div>
+
+
+        </div>
+
+
+        <div class="card-footer">
+
+            GDJSS Central Class of 2021 Association
+            <br>
+            Official Member Identification Card
+
+        </div>
+
+    </div>
+
+
+    <!-- PRINT -->
+
+    <button
+        type="button"
+        class="print-button"
+        id="printButton"
+        style="display:none;"
+        onclick="window.print()"
+    >
+        🖨️ Print / Save Member ID Card
+    </button>
+
+
+    <!-- BACK -->
+
+    <button
+        type="button"
+        class="back-button"
+        onclick="window.location.href='member-dashboard.html'"
+    >
+        ← Back to Dashboard
+    </button>
+
+</div>
+
+
+<script>
+
+/* =========================================
+   SUPABASE
+========================================= */
+
+const SUPABASE_URL =
+"https://nfivwaxynfcqumupcttp.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_cW8I1UvkW1jvGNDeh_NTPg_QicAc9G7";
+
+
+const db =
+window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+
+/* =========================================
+   LOAD MEMBER
+========================================= */
+
+async function loadMember(){
+
+    const input =
+        document
+        .getElementById("memberId")
+        .value
+        .trim()
+        .toUpperCase();
+
+
+    const message =
+        document.getElementById("message");
+
+
+    const card =
+        document.getElementById("idCard");
+
+
+    const printButton =
+        document.getElementById("printButton");
+
+
+    const memberPhoto =
+        document.getElementById("memberPhoto");
+
+
+    const noPhoto =
+        document.getElementById("noPhoto");
+
+
+    card.style.display =
+        "none";
+
+
+    printButton.style.display =
+        "none";
+
+
+    memberPhoto.style.display =
+        "none";
+
+
+    noPhoto.style.display =
+        "flex";
+
+
+    /* EMPTY */
+
+    if(!input){
+
+        message.innerHTML =
+        '<div class="not-found">' +
+        'Please enter your Member ID.' +
+        '</div>';
+
+        return;
+    }
+
+
+    /* ONLY 2021 */
+
+    if(
+        !input.startsWith(
+            "GDJSS-2021-"
+        )
+    ){
+
+        message.innerHTML =
+        '<div class="not-found">' +
+        'Invalid Member ID. This portal is for GDJSS Class of 2021.' +
+        '<br><br>' +
+        'Example: GDJSS-2021-0001' +
+        '</div>';
+
+        return;
+    }
+
+
+    message.innerHTML =
+        "Loading member information...";
+
+
+    try{
+
+
+        /* VERIFY MEMBER */
+
+        const {
+            data,
+            error
+        } =
+        await db.rpc(
+            "verify_member",
+            {
+                member_id_input:
+                    input
+            }
+        );
+
+
+        if(error){
+
+            console.error(error);
+
+            message.innerHTML =
+            '<div class="not-found">' +
+            'Unable to load member information.<br>' +
+            error.message +
+            '</div>';
+
+            return;
+        }
+
+
+        if(
+            !data ||
+            data.length === 0
+        ){
+
+            message.innerHTML =
+            '<div class="not-found">' +
+            'Member not found or not approved.' +
+            '</div>';
+
+            return;
+        }
+
+
+        const member =
+            data[0];
+
+
+        /* =================================
+           DISPLAY MEMBER
+        ================================= */
+
+
+        document.getElementById(
+            "memberName"
+        ).textContent =
+            member.full_name || "-";
+
+
+        document.getElementById(
+            "cardMemberId"
+        ).textContent =
+            member.member_id || input;
+
+
+        document.getElementById(
+            "memberClass"
+        ).textContent =
+            member.class_section || "-";
+
+
+        document.getElementById(
+            "memberState"
+        ).textContent =
+            member.state || "-";
+
+
+        document.getElementById(
+            "memberCity"
+        ).textContent =
+            member.city || "-";
+
+
+        /* =================================
+           PHOTO
+        ================================= */
+
+
+        if(
+            member.photo_url &&
+            String(
+                member.photo_url
+            ).trim() !== ""
+        ){
+
+            memberPhoto.src =
+                member.photo_url;
+
+            memberPhoto.style.display =
+                "block";
+
+            noPhoto.style.display =
+                "none";
+
+        }else{
+
+            memberPhoto.style.display =
+                "none";
+
+            noPhoto.style.display =
+                "flex";
+
+        }
+
+
+        /* =================================
+           SUCCESS
+        ================================= */
+
+        message.innerHTML =
+        '<span class="success">' +
+        '✓ Member verified successfully' +
+        '</span>';
+
+
+        card.style.display =
+            "block";
+
+
+        printButton.style.display =
+            "block";
+
+
+    }catch(error){
+
+        console.error(error);
+
+        message.innerHTML =
+        '<div class="not-found">' +
+        'Error: ' +
+        error.message +
+        '</div>';
+
+    }
+
+}
+
+
+/* =========================================
+   ENTER KEY
+========================================= */
+
+document
+.getElementById("memberId")
+.addEventListener(
+    "keydown",
+    function(event){
+
+        if(
+            event.key === "Enter"
+        ){
+
+            loadMember();
+
+        }
+
+    }
+);
+
+</script>
+
+</body>
+</html>
