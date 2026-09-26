@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>GDJSS - Membership Payment</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#f3f6f9;
+    color:#222;
+    padding:25px 15px;
+}
+
+.container{
+    max-width:500px;
+    margin:auto;
+}
+
+.header{
+    background:#0b3d2e;
+    color:white;
+    text-align:center;
+    padding:25px 15px;
+    border-radius:15px 15px 0 0;
+}
+
+.header h1{
+    margin:0 0 8px;
+    font-size:22px;
+}
+
+.header p{
+    margin:0;
+}
+
+.card{
+    background:white;
+    padding:25px;
+    border-radius:0 0 15px 15px;
+    box-shadow:0 4px 18px rgba(0,0,0,.08);
+    text-align:center;
+}
+
+.amount{
+    font-size:38px;
+    font-weight:bold;
+    color:#0b3d2e;
+    margin:20px 0 10px;
+}
+
+.note{
+    background:#eef8f6;
+    padding:15px;
+    border-radius:8px;
+    line-height:1.6;
+    margin:20px 0;
+}
+
+button{
+    width:100%;
+    padding:15px;
+    border:0;
+    border-radius:8px;
+    background:#0b3d2e;
+    color:white;
+    font-size:17px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+button:disabled{
+    background:#777;
+}
+
+.message{
+    margin-top:18px;
+    font-weight:bold;
+    line-height:1.5;
+}
+
+.error{
+    color:#dc3545;
+}
+
+.success{
+    color:#198754;
+}
+
+.loading{
+    color:#555;
+}
+
+.footer{
+    text-align:center;
+    color:#666;
+    font-size:13px;
+    margin-top:18px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+
+        <h1>
+            GDJSS CENTRAL CLASS OF 2021
+        </h1>
+
+        <p>
+            Membership Activation
+        </p>
+
+    </div>
+
+    <div class="card">
+
+        <h2>
+            🔐 Activate Your Membership
+        </h2>
+
+        <div class="amount">
+            ₦500
+        </div>
+
+        <div class="note">
+
+            Please complete the
+            <strong>₦500 membership payment</strong>
+            before accessing your GDJSS Member Dashboard.
+
+            <br><br>
+
+            After successful payment,
+            your membership will be activated.
+
+        </div>
+
+        <button
+            type="button"
+            id="payButton"
+        >
+            💳 Pay ₦500 Now
+        </button>
+
+        <div
+            id="message"
+            class="message"
+        ></div>
+
+    </div>
+
+    <div class="footer">
+
+        GDJSS Central Class of 2021 Association
+
+    </div>
+
+</div>
+
+
+<!-- PAYSTACK -->
+
+<script src="https://js.paystack.co/v2/inline.js"></script>
+
+
+<script>
+
+/* =========================================
+   PAYSTACK PUBLIC KEY
+========================================= */
+
+const PAYSTACK_PUBLIC_KEY =
+"pk_test_846373a656b994030141d74c407c3892fafce4b7";
+
+
+/* =========================================
+   SUPABASE
+========================================= */
+
+const SUPABASE_URL =
+"https://nfivwaxynfcqumupcttp.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_cW8I1UvkW1jvGNDeh_NTPg_QicAc9G7";
+
+
+const db =
+window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+
+/* =========================================
+   EDGE FUNCTION
+========================================= */
+
+const VERIFY_URL =
+"https://nfivwaxynfcqumupcttp.supabase.co/functions/v1/swift-handler";
+
+
+/* =========================================
+   DASHBOARD
+========================================= */
+
+const DASHBOARD_URL =
+"member-dashboard.html";
+
+
+/* =========================================
+   ELEMENTS
+========================================= */
+
+const payButton =
+document.getElementById("payButton");
+
+const message =
+document.getElementById("message");
+
+
+/* =========================================
+   PAYMENT
+========================================= */
+
+payButton.addEventListener(
+    "click",
+    startPayment
+);
+
+
+async function startPayment(){
+
+    payButton.disabled = true;
+
+    message.className =
+        "message loading";
+
+    message.textContent =
+        "Preparing payment...";
+
+
+    try{
+
+        /* ================================
+           GET CURRENT SESSION
+        ================================= */
+
+        const sessionResult =
+            await db.auth.getSession();
+
+        const session =
+            sessionResult.data.session;
+
+
+        if(!session){
+
+            throw new Error(
+                "Please login to your GDJSS account first."
+            );
+
+        }
+
+
+        const user =
+            session.user;
+
+
+        /* ================================
+           GET MEMBER ACCOUNT
+        ================================= */
+
+        const accountResult =
+            await db
+            .from("member_accounts")
+            .select(
+                "id,member_id,is_active,payment_status"
+            )
+            .eq(
+                "user_id",
+                user.id
+            )
+            .maybeSingle();
+
+
+        if(accountResult.error){
+
+            throw accountResult.error;
+
+        }
+
+
+        const account =
+            accountResult.data;
+
+
+        if(!account){
+
+            throw new Error(
+                "Your GDJSS member account was not found."
+            );
+
+        }
+
+
+        if(account.is_active !== true){
+
+            throw new Error(
+                "Your GDJSS member account is not active."
+            );
+
+        }
+
+
+        /* ================================
+           CHECK PAYMENT STATUS
+        ================================= */
+
+        if(
+            account.payment_status === "paid"
+        ){
+
+            message.className =
+                "message success";
+
+            message.textContent =
+                "Your membership payment is already confirmed. Opening dashboard...";
+
+
+            setTimeout(
+                function(){
+
+                    window.location.replace(
+                        DASHBOARD_URL
+                    );
+
+                },
+                1000
+            );
+
+            return;
+
+        }
+
+
+        /* ================================
+           CREATE UNIQUE REFERENCE
+        ================================= */
+
+        const reference =
+            "GDJSS-" +
+            Date.now() +
+            "-" +
+            Math.random()
+            .toString(36)
+            .substring(2,8)
+            .toUpperCase();
+
+
+        console.log(
+            "PAYMENT REFERENCE:",
+            reference
+        );
+
+
+        /* ================================
+           OPEN PAYSTACK
+        ================================= */
+
+        message.textContent =
+            "Opening Paystack payment...";
+
+
+        const handler =
+            PaystackPop.setup({
+
+                key:
+                    PAYSTACK_PUBLIC_KEY,
+
+                email:
+                    user.email,
+
+                amount:
+                    50000,
+
+                currency:
+                    "NGN",
+
+                ref:
+                    reference,
+
+
+                callback:
+                    async function(response){
+
+                        await verifyPayment(
+                            response.reference
+                        );
+
+                    },
+
+
+                onClose:
+                    function(){
+
+                        payButton.disabled =
+                            false;
+
+                        message.className =
+                            "message";
+
+                        message.textContent =
+                            "Payment window closed.";
+
+                    }
+
+            });
+
+
+        handler.openIframe();
+
+
+    }catch(error){
+
+        console.error(error);
+
+        message.className =
+            "message error";
+
+        message.textContent =
+            "❌ " +
+            (
+                error.message ||
+                "Unable to start payment."
+            );
+
+        payButton.disabled =
+            false;
+
+    }
+
+}
+
+
+/* =========================================
+   VERIFY PAYMENT
+========================================= */
+
+async function verifyPayment(reference){
+
+    message.className =
+        "message loading";
+
+    message.textContent =
+        "Payment received. Verifying payment...";
+
+
+    payButton.disabled =
+        true;
+
+
+    try{
+
+        /* ================================
+           GET SESSION AGAIN
+        ================================= */
+
+        const sessionResult =
+            await db.auth.getSession();
+
+        const session =
+            sessionResult.data.session;
+
+
+        if(!session){
+
+            throw new Error(
+                "Your login session has expired. Please login again."
+            );
+
+        }
+
+
+        /* ================================
+           SEND REFERENCE TO EDGE FUNCTION
+        ================================= */
+
+        const response =
+            await fetch(
+                VERIFY_URL,
+                {
+
+                    method:"POST",
+
+                    headers:{
+                        "Content-Type":
+                            "application/json",
+
+                        "Authorization":
+                            "Bearer " +
+                            session.access_token
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            reference:
+                                reference
+
+                        })
+
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        console.log(
+            "VERIFICATION RESULT:",
+            result
+        );
+
+
+        if(!response.ok){
+
+            throw new Error(
+                result.message ||
+                "Payment verification failed."
+            );
+
+        }
+
+
+        if(
+            result.success !== true
+        ){
+
+            throw new Error(
+                result.message ||
+                "Payment verification failed."
+            );
+
+        }
+
+
+        /* ================================
+           PAYMENT VERIFIED
+        ================================= */
+
+        message.className =
+            "message success";
+
+        message.textContent =
+            "✅ Payment verified successfully! Opening your Member Dashboard...";
+
+
+        setTimeout(
+            function(){
+
+                window.location.replace(
+                    DASHBOARD_URL
+                );
+
+            },
+            1200
+        );
+
+
+    }catch(error){
+
+        console.error(
+            "VERIFY ERROR:",
+            error
+        );
+
+
+        message.className =
+            "message error";
+
+        message.textContent =
+            "❌ " +
+            (
+                error.message ||
+                "Payment verification failed."
+            );
+
+
+        payButton.disabled =
+            false;
+
+    }
+
+}
+
+</script>
+
+</body>
+</html>
