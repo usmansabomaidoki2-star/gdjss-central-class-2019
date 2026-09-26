@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>GDJSS - Membership Payment</title>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#f3f6f9;
+    color:#222;
+    padding:25px 15px;
+}
+
+.container{
+    max-width:500px;
+    margin:auto;
+}
+
+.header{
+    background:#0b3d2e;
+    color:white;
+    text-align:center;
+    padding:25px 15px;
+    border-radius:15px 15px 0 0;
+}
+
+.header h1{
+    margin:0 0 8px;
+    font-size:22px;
+}
+
+.header p{
+    margin:0;
+}
+
+.card{
+    background:white;
+    padding:25px;
+    border-radius:0 0 15px 15px;
+    box-shadow:0 4px 18px rgba(0,0,0,.08);
+    text-align:center;
+}
+
+.amount{
+    font-size:38px;
+    font-weight:bold;
+    color:#0b3d2e;
+    margin:20px 0 10px;
+}
+
+.note{
+    background:#eef8f6;
+    padding:15px;
+    border-radius:8px;
+    line-height:1.6;
+    margin:20px 0;
+}
+
+button{
+    width:100%;
+    padding:15px;
+    border:0;
+    border-radius:8px;
+    background:#0b3d2e;
+    color:white;
+    font-size:17px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+button:disabled{
+    background:#777;
+}
+
+.message{
+    margin-top:18px;
+    font-weight:bold;
+    line-height:1.5;
+}
+
+.error{
+    color:#dc3545;
+}
+
+.success{
+    color:#198754;
+}
+
+.footer{
+    text-align:center;
+    color:#666;
+    font-size:13px;
+    margin-top:18px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+
+        <h1>
+            GDJSS CENTRAL CLASS OF 2021
+        </h1>
+
+        <p>
+            Membership Activation
+        </p>
+
+    </div>
+
+    <div class="card">
+
+        <h2>
+            🔐 Activate Your Membership
+        </h2>
+
+        <div class="amount">
+            ₦500
+        </div>
+
+        <div class="note">
+
+            Please complete the
+            <strong>₦500 membership payment</strong>
+            before accessing your GDJSS Member Dashboard.
+
+            <br><br>
+
+            After successful payment,
+            your membership will be activated.
+
+        </div>
+
+        <button
+            type="button"
+            id="payButton"
+        >
+            💳 Pay ₦500 Now
+        </button>
+
+        <div
+            id="message"
+            class="message"
+        ></div>
+
+    </div>
+
+    <div class="footer">
+
+        GDJSS Central Class of 2021 Association
+
+    </div>
+
+</div>
+
+
+<!-- PAYSTACK -->
+
+<script src="https://js.paystack.co/v2/inline.js"></script>
+
+
+<script>
+
+/* =========================================
+   PAYSTACK TEST PUBLIC KEY
+========================================= */
+
+const PAYSTACK_PUBLIC_KEY =
+"pk_test_846373a656b994030141d74c407c3892fafce4b7";
+
+
+/* =========================================
+   SUPABASE
+========================================= */
+
+const SUPABASE_URL =
+"https://nfivwaxynfcqumupcttp.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_cW8I1UvkW1jvGNDeh_NTPg_QicAc9G7";
+
+
+const db =
+window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+
+/* =========================================
+   ELEMENTS
+========================================= */
+
+const payButton =
+document.getElementById(
+    "payButton"
+);
+
+const message =
+document.getElementById(
+    "message"
+);
+
+
+/* =========================================
+   PAYMENT
+========================================= */
+
+payButton.addEventListener(
+    "click",
+    async function(){
+
+        payButton.disabled = true;
+
+        message.className =
+            "message";
+
+        message.textContent =
+            "Preparing payment...";
+
+
+        try{
+
+            /*
+               Get logged-in user
+            */
+
+            const sessionResult =
+                await db.auth.getSession();
+
+
+            const session =
+                sessionResult.data.session;
+
+
+            if(!session){
+
+                throw new Error(
+                    "Please login first."
+                );
+
+            }
+
+
+            const user =
+                session.user;
+
+
+            /*
+               Get member account
+            */
+
+            const accountResult =
+                await db
+                .from("member_accounts")
+                .select(
+                    "member_id,is_active,payment_status"
+                )
+                .eq(
+                    "user_id",
+                    user.id
+                )
+                .maybeSingle();
+
+
+            if(accountResult.error){
+
+                throw accountResult.error;
+
+            }
+
+
+            if(!accountResult.data){
+
+                throw new Error(
+                    "Member account was not found."
+                );
+
+            }
+
+
+            /*
+               Already paid?
+            */
+
+            if(
+                accountResult.data.payment_status ===
+                "paid"
+            ){
+
+                window.location.replace(
+                    "member-dashboard.html"
+                );
+
+                return;
+
+            }
+
+
+            /*
+               Open Paystack
+            */
+
+            const handler =
+                PaystackPop.setup({
+
+                    key:
+                        PAYSTACK_PUBLIC_KEY,
+
+                    email:
+                        user.email,
+
+                    amount:
+                        50000,
+
+                    currency:
+                        "NGN",
+
+                    ref:
+                        "GDJSS-" +
+                        Date.now() +
+                        "-" +
+                        Math.random()
+                        .toString(36)
+                        .substring(2,8),
+
+                    callback:
+                        function(response){
+
+                            /*
+                               IMPORTANT:
+                               Payment verification
+                               will be added in
+                               the next step.
+                            */
+
+                            message.className =
+                                "message success";
+
+                            message.textContent =
+                                "Payment received. Verifying payment...";
+
+                            console.log(
+                                "PAYSTACK REFERENCE:",
+                                response.reference
+                            );
+
+                            /*
+                               We will connect this
+                               to secure backend
+                               verification next.
+                            */
+
+                        },
+
+                    onClose:
+                        function(){
+
+                            payButton.disabled =
+                                false;
+
+                            message.className =
+                                "message";
+
+                            message.textContent =
+                                "Payment window closed.";
+
+                        }
+
+                });
+
+
+            handler.openIframe();
+
+
+        }catch(error){
+
+            console.error(error);
+
+            message.className =
+                "message error";
+
+            message.textContent =
+                "❌ " +
+                (
+                    error.message ||
+                    "Unable to start payment."
+                );
+
+            payButton.disabled =
+                false;
+
+        }
+
+    });
+
+</script>
+
+</body>
+</html>
